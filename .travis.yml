@@ -1,3 +1,8 @@
+services:
+  - redis-server
+rvm: 2.4.1
+before_install:
+  - rvm list
 before_script:
   - export DB_STRUCTURE_URL=https://raw.githubusercontent.com/travis-ci/travis-migrations/master/db/main/structure.sql
   - createdb travis_test || true

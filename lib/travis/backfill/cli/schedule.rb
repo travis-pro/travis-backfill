@@ -10,17 +10,16 @@ module Travis
 
         purpose 'Schedule tasks for backfilling records'
 
+        MSGS = {
+          announce: 'Starting scheduling on %d shards size=%d.'
+        }
+
         DEFAULTS = {
           # TODO defaults should be per task, e.g. BACKFILL_PULL_REQUEST_SCHEDULE_OFFSET
           offset:   ENV['PULL_REQUESTS_SCHEDULE_OFFSET'] || 0,
-          count:    ENV['PULL_REQUESTS_SCHEDULE_COUNT']  || (ENV['ENV'] == 'production' ? 10_000_000 : 250_000),
-          threads:  ENV['PULL_REQUESTS_SCHEDULE_SHARDS'] || (ENV['ENV'] == 'production' ? 6 : 3),
+          threads:  ENV['PULL_REQUESTS_SCHEDULE_SHARDS'] || (ENV['ENV'] == 'production' ? 4 : 2),
           per_page: ENV['PULL_REQUESTS_SCHEDULE_PAGE']   || 10_000
         }
-
-        on '-c', '--count COUNT', 'Total number of records to schedule per shard' do |value|
-          opts[:count] = value.to_i
-        end
 
         on '-o', '--offset OFFSET', 'Starting point for N shards' do |value|
           opts[:offset] = value.to_i
@@ -43,6 +42,7 @@ module Travis
         end
 
         def run
+          announce
           1.upto(threads) do |num|
             start = (num - 1) * count + offset
             Thread.new { schedule(num, start) }
@@ -50,8 +50,12 @@ module Travis
           sleep
         end
 
+        def announce
+          puts MSGS[:announce] % [threads, count, count + offset]
+        end
+
         def schedule(num, start)
-          Backfill::Schedule.new(opts.merge(num: num, start: start)).run
+          Backfill::Schedule.new(opts.merge(num: num, start: start, count: count)).run
         rescue => e
           puts e.message, e.backtrace
           sleep 2
@@ -63,11 +67,20 @@ module Travis
         end
 
         def count
-          opts[:count].to_i
+          count = max_id / threads
+          (count.to_s[0..1].to_i + 1).to_s.ljust(count.to_s.size, '0').to_i
+        end
+
+        def max_id
+          @max_id ||= Registry[:store][task].new.max_id
         end
 
         def threads
           opts[:threads] || 1
+        end
+
+        def task
+          opts[:task]
         end
 
         def opts

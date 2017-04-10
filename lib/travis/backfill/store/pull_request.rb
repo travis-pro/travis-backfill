@@ -8,6 +8,10 @@ module Travis
         class Base < Struct.new(:opts)
           include Registry
 
+          def max_id
+            ::PullRequest.maximum(:id).to_i
+          end
+
           def ids_within(range)
             scope = ::PullRequest.where(id: range)
             scope = scope.where(state: nil) unless rerun?
@@ -37,6 +41,10 @@ module Travis
           include Registry
 
           register :store, 'pull_request:create'
+
+          def max_id
+            Request.maximum(:id).to_i
+          end
 
           def ids_within(range)
             scope = Request.where(id: range, event_type: :pull_request)
