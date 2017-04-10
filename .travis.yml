@@ -1,0 +1,6 @@
+before_script:
+  - export DB_STRUCTURE_URL=https://raw.githubusercontent.com/travis-ci/travis-migrations/master/db/main/structure.sql
+  - createdb travis_test || true
+  - curl -fs $DB_STRUCTURE_URL | psql travis_test
+script: bundle exec rspec
+

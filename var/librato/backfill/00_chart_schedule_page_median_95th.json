@@ -1,0 +1,27 @@
+{
+  "name": "Schedule Page Median/95th",
+  "type": "line",
+  "streams": [
+    {
+      "metric": "backfill.pull_request:create.schedule_page.95th_percentile",
+      "type": "gauge",
+      "source": "*",
+      "group_function": "max",
+      "summary_function": "max",
+      "position": 0,
+      "split_axis": false
+    },
+    {
+      "metric": "backfill.pull_request:create.schedule_page.median",
+      "type": "gauge",
+      "source": "*",
+      "group_function": "average",
+      "summary_function": "average",
+      "position": 1,
+      "split_axis": false
+    }
+  ],
+  "thresholds": [
+
+  ]
+}

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+threads=${1:-5}
+shift
+queues=$@
+args=
+
+export RUBYOPT="-Ilib $RUBYOPT"
+
+cmd="sidekiq -r ./lib/travis/backfill.rb -c $threads"
+for queue in $queues; do
+  cmd="$cmd -q $queue"
+done
+
+echo "Running: $cmd"
+exec $cmd
