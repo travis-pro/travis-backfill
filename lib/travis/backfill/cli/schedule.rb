@@ -67,8 +67,9 @@ module Travis
         end
 
         def count
-          count = max_id / threads
-          (count.to_s[0..1].to_i + 1).to_s.ljust(count.to_s.size, '0').to_i
+          count = max_id / threads * 2
+          log = Math.log10(count).floor
+          count = (count / (10.0 ** log)).ceil * 10 ** log / 2
         end
 
         def max_id
