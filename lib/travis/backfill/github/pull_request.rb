@@ -14,24 +14,24 @@ module Travis
         attr_reader :token
 
         def data
-          @data ||= map(fetch)
+          @data ||= map(Payload.new(fetch || unknown))
         end
 
         private
 
           def map(data)
             compact(
-              number: data['number'],
-              state:  data['state'],
-              title:  data['title']
+              number: data.number.value,
+              state:  data.state.value,
+              title:  data.title.value
             )
           end
 
           def unknown
-            {
-              'number' => params[:number],
-              'state'  => 'unknown'
-            }
+            stringify(
+              number: params[:number],
+              state: 'unknown'
+            )
           end
 
           def fetch
@@ -45,11 +45,11 @@ module Travis
             yield
           rescue Faraday::ClientError => e
             retry if tokens.any?
-            unknown
+            nil
           end
 
           def path
-            RESOURCE % [repo, number]
+            RESOURCE % [repo, number.to_i]
           end
 
           def http
@@ -78,6 +78,10 @@ module Travis
 
           def compact(hash)
             hash.reject { |_, value| value.nil? }.to_h
+          end
+
+          def stringify(hash)
+            hash.map { |k, v| [k.to_s, v.is_a?(Hash) ? deep_stringify(v) : v] }.to_h
           end
       end
     end

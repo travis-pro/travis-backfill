@@ -1,3 +1,6 @@
+require 'travis/backfill/helper/hash'
+require 'travis/backfill/helper/metrics'
+require 'travis/backfill/helper/memoize'
 require 'travis/support/registry'
 
 module Travis
@@ -5,50 +8,52 @@ module Travis
     module Task
       module PullRequest
         class State < Struct.new(:params)
-          include Registry
+          include Helper::Hash, Memoize, Metrics, Registry
 
           register :task, 'pull_request:state'
 
-          def run
-            record.update_attributes!(state: data[:state])
+          def run?
+            !pull_request.state && repo && number
           end
+
+          def run
+            update
+          end
+          meter :run
 
           private
 
-            def record
-              ::PullRequest.find(id)
+            def update
+              pull_request.update_attributes!(state: data[:state])
             end
 
             def data
               Github::PullRequest.new(repo: repo.slug, number: number, tokens: tokens).data
             end
 
-            def id
-              params[:id]
+            def pull_request
+              params[:pull_request]
             end
 
             def repo
-              record.repository
+              pull_request.repository
             end
+            memoize :repo
 
             def number
-              record.number
+              pull_request.number
+            end
+
+            def request
+              params[:request]
             end
 
             def tokens
-              User.where(id: user_ids).pluck(:github_oauth_token).compact
+              User.where(id: user_ids).map(&:github_oauth_token).compact
             end
 
             def user_ids
               Permission.where(repository_id: repo.id).pluck(:user_id)
-            end
-          end
-
-          def permissions(attrs)
-            Record::Permission.where(attrs.merge(repository_id: repo_id))
-
-            def params
-              super || {}
             end
         end
       end

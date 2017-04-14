@@ -1,3 +1,4 @@
+require 'sidekiq/cli' # force server mode for connection pool size (hrm?)
 require 'travis/backfill/schedule'
 
 module Travis
@@ -15,10 +16,11 @@ module Travis
         }
 
         DEFAULTS = {
-          # TODO defaults should be per task, e.g. BACKFILL_PULL_REQUEST_SCHEDULE_OFFSET
-          offset:   ENV['PULL_REQUESTS_SCHEDULE_OFFSET'] || 0,
-          threads:  ENV['PULL_REQUESTS_SCHEDULE_SHARDS'] || (ENV['ENV'] == 'production' ? 4 : 2),
-          per_page: ENV['PULL_REQUESTS_SCHEDULE_PAGE']   || 10_000
+          # TODO make defaults dynamic per task key
+          offset:   ENV['BACKFILL_REQUEST_UPDATE_SCHEDULE_OFFSET'] || 0,
+          threads:  ENV['BACKFILL_REQUEST_UPDATE_SCHEDULE_SHARDS'] || 1,
+          per_page: ENV['BACKFILL_REQUEST_UPDATE_SCHEDULE_PAGE']   || 1000,
+          rerun:    ENV['BACKFILL_REQUEST_UPDATE_SCHEDULE_RERUN']
         }
 
         on '-o', '--offset OFFSET', 'Starting point for N shards' do |value|
@@ -73,7 +75,7 @@ module Travis
         end
 
         def max_id
-          @max_id ||= Registry[:store][task].new.max_id
+          @max_id ||= Registry[:task][task].store.new.max_id
         end
 
         def threads
@@ -89,7 +91,7 @@ module Travis
         end
 
         def defaults
-          compact(DEFAULTS).map { |key, value| [key, value.to_i] }.to_h
+          compact(DEFAULTS).map { |key, value| [key, key == :rerun ? value : value.to_i] }.to_h
         end
 
         def compact(hash)

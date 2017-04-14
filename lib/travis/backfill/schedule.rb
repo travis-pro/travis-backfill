@@ -4,13 +4,13 @@ require 'travis/support/registry'
 module Travis
   module Backfill
     class Schedule
-      MAX_QUEUE_SIZE = ENV['BACKFILL_MAX_QUEUE_SIZE'] || 10_000
+      MAX_QUEUE_SIZE = Integer(ENV['BACKFILL_MAX_QUEUE_SIZE'] || 10_000)
 
       attr_reader :store, :cursor, :num, :start, :count, :per_page, :max, :opts
 
       def initialize(opts)
         @opts     = opts
-        @store    = Registry[:store][task].new(rerun: opts[:rerun])
+        @store    = Registry[:task][task].store.new(rerun: opts[:rerun])
         @num      = opts[:num]
         @start    = opts[:start]
         @count    = opts[:count]
@@ -21,9 +21,9 @@ module Travis
       end
 
       MSGS = {
-        start: 'Start cursor=%{cursor} count=%{count} max=%{max} per_page=%{per_page}',
-        page:  'Page cursor=%{cursor} count=%{count} max=%{max} per_page=%{per_page}',
-        done:  'Done cursor=%{cursor} count=%{count} max=%{max} per_page=%{per_page}',
+        start: 'Start cursor=%{cursor} count=%{count} max=%{max} per_page=%{per_page} queue=%{queue}',
+        page:  'Page cursor=%{cursor} count=%{count} max=%{max} per_page=%{per_page} queue=%{queue}',
+        done:  'Done cursor=%{cursor} count=%{count} max=%{max} per_page=%{per_page} queue=%{queue}',
       }
 
       def run
@@ -39,49 +39,33 @@ module Travis
 
       private
 
-        def monitor
-          loop do
-            gauge_cursor
-            gauge_queue_size
-            gauge_redis_memory
-            sleep 5
-          end
-        rescue => e
-          puts e.message, e.backtrace
-        end
-
         def process
           while cursor < max do
-            sleep 5 while pause?
+            sleep 0.5 while pause?
             info :page
             process_page
             @cursor += per_page
             store_cursor
-            sleep jitter unless testing?
+            meter
+            # sleep jitter unless testing?
           end
         end
 
         def process_page
           time :schedule_page do
-            ids.each do |id|
-              schedule(id)
-              meter
-            end
+            ::Sidekiq::Client.push_bulk(
+              'queue' => 'backfill',
+              'class' => 'Travis::Backfill::Worker',
+              'args'  => ids.map { |id| [:backfill, task, id: id] }
+            )
           end
-        end
-
-        def schedule(id)
-          ::Sidekiq::Client.push(
-            'queue' => 'backfill',
-            'class' => 'Travis::Backfill::Worker',
-            'args'  => [:backfill, task, id: id]
-          )
         end
 
         def ids
           from = cursor
           to = [cursor + per_page, max].min - 1
-          store.ids_within(from..to)
+          # store.ids_within(from..to)
+          from..to
         end
 
         def testing?
@@ -117,8 +101,19 @@ module Travis
         end
 
         def info(msg)
-          msg = MSGS[msg] % { cursor: cursor, count: count, max: max, per_page: per_page }
+          msg = MSGS[msg] % { cursor: cursor, count: count, max: max, per_page: per_page, queue: queue.size }
           logger.info "[#{num}] #{msg}"
+        end
+
+        def monitor
+          loop do
+            gauge_cursor
+            gauge_queue_size
+            gauge_redis_memory
+            sleep 5
+          end
+        rescue => e
+          puts e.message, e.backtrace
         end
 
         def gauge_cursor

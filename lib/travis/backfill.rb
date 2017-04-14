@@ -21,7 +21,7 @@ module Travis
         @config  = Config.load
         @logger  = Logger.new(STDOUT)
         @redis   = RedisPool.new(config.redis.to_h)
-        @metrics = Metrics.setup(config.metrics.to_h, logger)
+        @metrics = Travis::Metrics.setup(config.metrics.to_h, logger)
 
         Database.connect(config.database.to_h)
         Sidekiq.setup(config)
@@ -30,5 +30,11 @@ module Travis
     end
 
     setup
+  end
+end
+
+Payload = Struct.new(:value) do
+  def method_missing(name)
+    Payload.new(value.nil? ? nil : value[name.to_s])
   end
 end

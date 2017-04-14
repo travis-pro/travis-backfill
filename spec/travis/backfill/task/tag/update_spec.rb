@@ -1,11 +1,10 @@
-describe Travis::Backfill::Task::Tag::Create do
+describe Travis::Backfill::Task::Tag::Update do
   let(:name)    { 'upstream/1.0.0' }
-  let(:data)    { { ref: "refs/tags/#{name}" } }
-  let(:request) { FactoryGirl.create(:request, repository_id: 1, commit: commit, payload: deep_stringify(data), created_at: 1.year.ago) }
+  let(:data)    { Payload.new(deep_stringify(ref: "refs/tags/#{name}")) }
+  let(:request) { FactoryGirl.create(:request, repository_id: 1, commit: commit, builds: [build], payload: deep_stringify(data), created_at: 1.year.ago) }
   let(:commit)  { FactoryGirl.create(:commit) }
-  let!(:build)  { FactoryGirl.create(:build, request_id: request.id) }
-  let(:params)  { { id: request.id } }
-  let(:task)    { described_class.new(params) }
+  let(:build)   { FactoryGirl.create(:build) }
+  let(:task)    { described_class.new(request: request, commit: commit, build: build, data: data) }
   let(:record)  { request.reload.tag }
 
   before { task.run }

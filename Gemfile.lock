@@ -90,7 +90,7 @@ GEM
     thread_safe (0.3.6)
     tilt (2.0.7)
     travis-encrypt (0.0.1)
-    travis-metrics (2.0.0.rc8)
+    travis-metrics (2.0.0)
       metriks-librato_metrics (~> 1.0)
     tzinfo (1.2.3)
       thread_safe (~> 0.1)

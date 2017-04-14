@@ -11,6 +11,7 @@ class Request < ActiveRecord::Base
   belongs_to :pull_request
   belongs_to :commit
   belongs_to :owner, polymorphic: true
+  belongs_to :sender, polymorphic: true
   has_many   :builds, autosave: false
 
   serialize :config
@@ -36,10 +37,13 @@ class Request < ActiveRecord::Base
     pull_request ? pull_request.title : pr.title.value if pull_request?
   end
 
-  # def payload
-  #   Travis::Gatekeeper.logger.debug "[deprectated] Reading request.payload. Called from #{caller[0]}" unless caller[0] =~ /(dirty.rb|request.rb|_spec.rb)/
-  #   super
-  # end
+  def tag?
+    event_type == 'push' && ref.to_s.start_with?('refs/tags/')
+  end
+
+  def ref
+    commit && commit.ref
+  end
 
   private
 

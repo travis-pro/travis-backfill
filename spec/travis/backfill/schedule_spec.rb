@@ -9,6 +9,10 @@ module Test
   end
 
   class Task < Struct.new(:params)
+    def self.store
+      Test::Store
+    end
+
     include Travis::Registry
     register :task, :test
 
@@ -29,11 +33,11 @@ describe Travis::Backfill::Schedule do
   let(:task)     { Test::Task }
   let(:sidekiq)  { Sidekiq::Client }
 
-  before { allow(sidekiq).to receive(:push).and_call_original }
+  before { allow(sidekiq).to receive(:push_bulk).and_call_original }
   before { schedule.run }
   after  { task.count = 0 }
 
-  it { expect(sidekiq).to have_received(:push).exactly(10).times }
+  it { expect(sidekiq).to have_received(:push_bulk).exactly(2).times }
   it { expect(task.count).to eq 10 }
 
   it { expect(log).to include 'Start cursor=0 count=10 max=10 per_page=5' }
