@@ -29,7 +29,8 @@ module Travis
             update_request # unless request.pull_request_id
             update_build   unless build.nil? # || build.pull_request_id
           end
-          time :run
+          # time :run
+          meter :run
 
           private
 

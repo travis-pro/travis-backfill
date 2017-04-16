@@ -29,7 +29,8 @@ module Travis
             update_commit  unless commit.nil? # || commit.tag_id
             update_build   unless build.nil? # || build.tag_id
           end
-          time :run
+          # time :run
+          meter :run
 
           private
 

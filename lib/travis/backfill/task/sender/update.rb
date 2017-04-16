@@ -32,7 +32,8 @@ module Travis
             update_request unless request.sender_id
             update_build   unless build.nil? || build.sender_id
           end
-          time :run
+          # time :run
+          meter :run
 
           private
 
