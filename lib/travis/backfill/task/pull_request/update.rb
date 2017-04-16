@@ -54,29 +54,29 @@ module Travis
             def find
               ::PullRequest.where(only(attrs, :repository_id, :number)).first
             end
-            time :find
+            # time :find
 
             def create
               ::PullRequest.create(attrs)
             end
-            time :create
+            # time :create
 
             def update
               record.update_attributes(except(attrs, :created_at))
             end
-            time :update
+            # time :update
 
             def update_request
               request.pull_request = record
               request.save!
             end
-            time :update_request
+            # time :update_request
 
             def update_build
               build.pull_request = record
               build.save!
             end
-            time :update_build
+            # time :update_build
 
             def update_state
               Registry[:task]['pull_request:state'].new(pull_request: record).run

@@ -46,42 +46,42 @@ module Travis
               find || create
             rescue ActiveRecord::RecordNotUnique => e
               warn "Tag record not uniq for request=#{request.id}. Retrying."
-              sleep 0.01
+              sleep 0.1
               retry
             end
 
             def find
               ::Tag.where(only(attrs, :repository_id, :name)).first
             end
-            time :find
+            # time :find
 
             def update
               record.update_attributes(except(attrs, :created_at))
             end
-            time :update
+            # time :update
 
             def create
               ::Tag.create(attrs)
             end
-            time :create
+            # time :create
 
             def update_request
               request.tag = record
               request.save!
             end
-            time :update_request
+            # time :update_request
 
             def update_commit
               commit.tag = record
               commit.save!
             end
-            time :update_build
+            # time :update_build
 
             def update_build
               build.tag = record
               build.save!
             end
-            time :update_commit
+            # time :update_commit
 
             def attrs
               @attrs ||= {

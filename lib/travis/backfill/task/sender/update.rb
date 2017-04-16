@@ -32,7 +32,7 @@ module Travis
             update_request unless request.sender_id
             update_build   unless build.nil? || build.sender_id
           end
-          meter :run
+          time :run
 
           private
 
@@ -51,24 +51,24 @@ module Travis
             def find
               ::User.where(github_id: attrs[:github_id]).first
             end
-            time :find
+            # time :find
 
             def create
               ::User.create(attrs)
             end
-            time :create
+            # time :create
 
             def update_request
               request.sender = record
               request.save!
             end
-            time :update_request
+            # time :update_request
 
             def update_build
               build.sender = record
               build.save!
             end
-            time :update_build
+            # time :update_build
 
             def attrs
               @attrs ||= {
