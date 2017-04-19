@@ -14,14 +14,10 @@ accounts:
   com:
     user: mathias@travis-ci.com
     vars:
-      app: travis-pro-github-sync
-      db_source: travis-pro-production.heroku_postgresql_maroon
-      db_name: maroon
+      app: travis-com-backfill
 
   org:
     user: mathias@travis-ci.org
     vars:
-      app: travis-github-sync
-      db_source: travis-production.heroku_postgresql_white
-      db_name: white
+      app: travis-org-backfill
 

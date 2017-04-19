@@ -1,0 +1,14 @@
+{
+  "name": "DB Transaction rate",
+  "type": "line",
+  "streams": [
+    {
+      "composite": "derive(s(\"heroku.logs.current_transaction\", \"travis-org.heroku_postgresql_white\"))",
+      "type": "composite",
+      "downsample_function": "average",
+      "position": 0,
+      "split_axis": false
+    }
+  ],
+  "thresholds": null
+}

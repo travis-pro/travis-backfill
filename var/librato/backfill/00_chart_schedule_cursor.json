@@ -3,57 +3,12 @@
   "type": "line",
   "streams": [
     {
-      "metric": "backfill.pull_request:create.schedule_cursor.6",
+      "metric": "backfill.request:update.schedule_cursor.1",
       "type": "gauge",
       "source": "*",
       "group_function": "average",
       "summary_function": "average",
       "position": 0,
-      "split_axis": false
-    },
-    {
-      "metric": "backfill.pull_request:create.schedule_cursor.2",
-      "type": "gauge",
-      "source": "*",
-      "group_function": "average",
-      "summary_function": "average",
-      "position": 1,
-      "split_axis": false
-    },
-    {
-      "metric": "backfill.pull_request:create.schedule_cursor.3",
-      "type": "gauge",
-      "source": "*",
-      "group_function": "average",
-      "summary_function": "average",
-      "position": 2,
-      "split_axis": false
-    },
-    {
-      "metric": "backfill.pull_request:create.schedule_cursor.4",
-      "type": "gauge",
-      "source": "*",
-      "group_function": "average",
-      "summary_function": "average",
-      "position": 3,
-      "split_axis": false
-    },
-    {
-      "metric": "backfill.pull_request:create.schedule_cursor.5",
-      "type": "gauge",
-      "source": "*",
-      "group_function": "average",
-      "summary_function": "average",
-      "position": 4,
-      "split_axis": false
-    },
-    {
-      "metric": "backfill.pull_request:create.schedule_cursor.1",
-      "type": "gauge",
-      "source": "*",
-      "group_function": "average",
-      "summary_function": "average",
-      "position": 5,
       "split_axis": false
     }
   ],

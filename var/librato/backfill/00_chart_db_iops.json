@@ -1,0 +1,23 @@
+{
+  "name": "DB IOPS",
+  "type": "line",
+  "streams": [
+    {
+      "metric": "heroku.logs.read-iops",
+      "type": "gauge",
+      "source": "travis-org.heroku_postgresql_white",
+      "summary_function": "average",
+      "position": 0,
+      "split_axis": false
+    },
+    {
+      "metric": "heroku.logs.write-iops",
+      "type": "gauge",
+      "source": "travis-org.heroku_postgresql_white",
+      "summary_function": "average",
+      "position": 1,
+      "split_axis": false
+    }
+  ],
+  "thresholds": null
+}

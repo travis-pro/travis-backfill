@@ -1,0 +1,23 @@
+{
+  "name": "DB Connections",
+  "type": "line",
+  "streams": [
+    {
+      "metric": "heroku.logs.waiting-connections",
+      "type": "gauge",
+      "source": "travis-org.heroku_postgresql_white",
+      "summary_function": "max",
+      "position": 0,
+      "split_axis": false
+    },
+    {
+      "metric": "heroku.logs.active-connections",
+      "type": "gauge",
+      "source": "travis-org.heroku_postgresql_white",
+      "summary_function": "max",
+      "position": 1,
+      "split_axis": false
+    }
+  ],
+  "thresholds": null
+}

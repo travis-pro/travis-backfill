@@ -1,0 +1,31 @@
+{
+  "name": "DB Load average",
+  "type": "line",
+  "streams": [
+    {
+      "metric": "heroku.logs.load-avg-15m",
+      "type": "gauge",
+      "source": "travis-org.heroku_postgresql_white",
+      "summary_function": "average",
+      "position": 0,
+      "split_axis": false
+    },
+    {
+      "metric": "heroku.logs.load-avg-5m",
+      "type": "gauge",
+      "source": "travis-org.heroku_postgresql_white",
+      "summary_function": "average",
+      "position": 1,
+      "split_axis": false
+    },
+    {
+      "metric": "heroku.logs.load-avg-1m",
+      "type": "gauge",
+      "source": "travis-org.heroku_postgresql_white",
+      "summary_function": "average",
+      "position": 2,
+      "split_axis": false
+    }
+  ],
+  "thresholds": null
+}

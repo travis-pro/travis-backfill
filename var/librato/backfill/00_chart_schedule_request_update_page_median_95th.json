@@ -1,9 +1,9 @@
 {
-  "name": "Schedule Page Median/95th",
+  "name": "Schedule request:update page median/95th",
   "type": "line",
   "streams": [
     {
-      "metric": "backfill.pull_request:create.schedule_page.95th_percentile",
+      "metric": "backfill.request:update.schedule_page.95th_percentile",
       "type": "gauge",
       "source": "*",
       "group_function": "max",
@@ -12,7 +12,7 @@
       "split_axis": false
     },
     {
-      "metric": "backfill.pull_request:create.schedule_page.median",
+      "metric": "backfill.request:update.schedule_page.median",
       "type": "gauge",
       "source": "*",
       "group_function": "average",

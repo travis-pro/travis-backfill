@@ -1,9 +1,9 @@
 {
-  "name": "Backfill queue size",
+  "name": "Redis Memory",
   "type": "line",
   "streams": [
     {
-      "metric": "backfill.queue_size",
+      "metric": "backfill.redis_memory",
       "type": "gauge",
       "source": "*",
       "group_function": "average",
