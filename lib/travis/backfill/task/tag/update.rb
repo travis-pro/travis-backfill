@@ -25,9 +25,9 @@ module Travis
           def run
             @record = find_or_create
             update
-            update_request # unless request.tag_id
-            update_commit  unless commit.nil? # || commit.tag_id
-            update_build   unless build.nil? # || build.tag_id
+            update_request unless request.tag_id
+            update_commit  unless commit.nil? || commit.tag_id
+            update_build   unless build.nil?  || build.tag_id
           end
           # time :run
           meter :run
@@ -39,8 +39,7 @@ module Travis
             end
 
             def incomplete?
-              # request.tag_id.nil? || commit.try(:tag_id).nil? || build.try(:tag_id).nil?
-              true
+              request.tag_id.nil? || commit.try(:tag_id).nil? || build.try(:tag_id).nil?
             end
 
             def find_or_create

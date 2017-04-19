@@ -28,7 +28,7 @@ module Travis
           end
 
           def run
-            @record = find_or_create
+            return unless @record = find_or_create
             update_request unless request.sender_id
             update_build   unless build.nil? || build.sender_id
           end
@@ -42,7 +42,9 @@ module Travis
             end
 
             def find_or_create
-              find || create
+              record = find
+              record ||= create unless api_or_cron?
+              record
             rescue ActiveRecord::RecordNotUnique => e
               warn "User record not uniq for request=#{request.id}. Retrying."
               sleep 0.01
@@ -50,12 +52,20 @@ module Travis
             end
 
             def find
-              ::User.where(github_id: attrs[:github_id]).first
+              api_or_cron? ? find_by_id : find_by_github_id
             end
             # time :find
 
+            def find_by_id
+              ::User.where(id: sender.id.value).first if sender.id.value
+            end
+
+            def find_by_github_id
+              ::User.where(github_id: attrs[:github_id]).first if attrs[:github_id]
+            end
+
             def create
-              ::User.create(attrs)
+              ::User.create(attrs) if attrs[:github_id] && attrs[:login]
             end
             # time :create
 
@@ -73,10 +83,18 @@ module Travis
 
             def attrs
               @attrs ||= {
-                github_id:  data.sender.id.value,
-                login:      data.sender.login.value,
-                avatar_url: data.sender.avatar_url.value
+                github_id:  sender.id.value,
+                login:      sender.login.value,
+                avatar_url: sender.avatar_url.value
               }
+            end
+
+            def sender
+              api_or_cron? ? data.user : data.sender
+            end
+
+            def api_or_cron?
+              ['api', 'cron'].include?(request.event_type)
             end
 
             def data

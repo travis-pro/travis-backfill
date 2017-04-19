@@ -26,8 +26,8 @@ module Travis
             @record = find_or_create
             update
             update_state   unless record.state
-            update_request # unless request.pull_request_id
-            update_build   unless build.nil? # || build.pull_request_id
+            update_request unless request.pull_request_id
+            update_build   unless build.nil? || build.pull_request_id
           end
           # time :run
           meter :run
@@ -39,9 +39,7 @@ module Travis
             end
 
             def incomplete?
-              # TODO
-              # request.pull_request_id.nil? || request.pull_request.state.nil? || build.try(:pull_request_id).nil?
-              true
+              request.pull_request_id.nil? || request.pull_request.state.nil? || build.try(:pull_request_id).nil?
             end
 
             def find_or_create
