@@ -50,9 +50,17 @@ module Travis
             end
 
             def find
-              ::User.where(github_id: attrs[:github_id]).first
+              api? ? find_by_id : find_by_github_id
             end
             # time :find
+
+            def find_by_id
+              ::User.where(id: attrs[:id]).first
+            end
+
+            def find_by_github_id
+              ::User.where(github_id: attrs[:github_id]).first
+            end
 
             def create
               ::User.create(attrs)
@@ -77,6 +85,14 @@ module Travis
                 login:      data.sender.login.value,
                 avatar_url: data.sender.avatar_url.value
               }
+            end
+
+            def sender
+              api? ? data.user : data.sender
+            end
+
+            def api?
+              request.event_type == :api
             end
 
             def data

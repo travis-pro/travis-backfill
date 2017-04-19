@@ -7,20 +7,21 @@ describe Travis::Backfill::Task::Tag::Update do
   let(:task)    { described_class.new(request: request, commit: commit, build: build, data: data) }
   let(:record)  { request.reload.tag }
 
-  before { task.run }
 
   shared_examples 'tag' do
+    before { task.run }
+
     it { expect(request.reload.tag_id).to eq record.id }
     it { expect(commit.reload.tag_id).to eq record.id }
     it { expect(build.reload.tag_id).to eq record.id }
 
     it { expect(record.repository_id).to eq 1 }
     it { expect(record.name).to eq name }
-    it { expect(record.created_at).to eq request.created_at }
   end
 
   describe 'the tag does not exist' do
     include_examples 'tag'
+    it { expect(record.created_at).to eq request.created_at }
   end
 
   describe 'the tag the record exists' do
