@@ -1,5 +1,8 @@
+language: ruby
+dist: trusty
 services:
   - redis-server
+  - postgresql
 rvm: 2.4.1
 before_install:
   - rvm list
@@ -8,4 +11,5 @@ before_script:
   - createdb travis_test || true
   - curl -fs $DB_STRUCTURE_URL | psql travis_test
 script: bundle exec rspec
-
+addons:
+  postgresql: "9.6"

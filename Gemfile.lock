@@ -118,5 +118,8 @@ DEPENDENCIES
   travis-metrics (~> 2.0.0.rc3)
   vcr
 
+RUBY VERSION
+   ruby 2.3.4p301
+
 BUNDLED WITH
-   1.14.5
+   1.14.6
