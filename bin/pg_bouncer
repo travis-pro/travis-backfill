@@ -8,4 +8,4 @@ if [ ! -f "bin/start-pgbouncer-stunnel" ]; then
 fi
 
 export PGBOUNCER_PREPARED_STATEMENTS=false
-bin/start-pgbouncer-stunnel "$@"
+exec bin/start-pgbouncer-stunnel "$@"
