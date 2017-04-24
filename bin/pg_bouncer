@@ -3,13 +3,10 @@
 cd "$(dirname "$0")/.."
 
 if [ ! -f "bin/start-pgbouncer-stunnel" ]; then
-  echo "warning: pgbouncer buildpack not found, setting PGBOUNCER_ENABLED=false"
-  export PGBOUNCER_ENABLED=false
+  echo "fatal: pgbouncer buildpack not found, please install it"
+  echo "https://github.com/heroku/heroku-buildpack-pgbouncer"
+  exit 1
 fi
 
-if [ "$PGBOUNCER_ENABLED" = '1' ] || [ "$PGBOUNCER_ENABLED" = 'true' ]; then
-    export PGBOUNCER_PREPARED_STATEMENTS=false
-    exec bin/start-pgbouncer-stunnel "$@"
-else
-    exec "$@"
-fi
+export PGBOUNCER_PREPARED_STATEMENTS=false
+exec bin/start-pgbouncer-stunnel "$@"
