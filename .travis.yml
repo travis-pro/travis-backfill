@@ -1,5 +1,8 @@
+language: ruby
+dist: trusty
 services:
   - redis-server
+  - postgresql
 rvm: 2.4.1
 before_install:
   - rvm list
