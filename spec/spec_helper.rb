@@ -1,3 +1,4 @@
+ENV.delete('DATABASE_URL')
 ENV['ENV'] = 'test'
 
 require 'sidekiq/testing'
