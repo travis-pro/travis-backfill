@@ -1,3 +1,5 @@
+require 'travis/backfill/helper/payload'
+
 class Request < ActiveRecord::Base
   class << self
     def last_by_head_commit(head_commit)
@@ -13,6 +15,7 @@ class Request < ActiveRecord::Base
   belongs_to :owner, polymorphic: true
   belongs_to :sender, polymorphic: true
   has_many   :builds, autosave: false
+  has_one    :payload, autosave: true
 
   serialize :config
   serialize :payload
@@ -45,15 +48,14 @@ class Request < ActiveRecord::Base
     commit && commit.ref
   end
 
+  def payload=(payload)
+    record = self.payload
+    record ? record.payload = payload : build_payload(payload: payload)
+  end
+
   private
 
     def pr
-      @pr ||= Payload.new(payload && payload['pull_request'])
-    end
-
-    Payload = Struct.new(:value) do
-      def method_missing(name)
-        Payload.new(value.nil? ? nil : value[name.to_s])
-      end
+      @pr ||= Helper::Payload.new(payload && payload['pull_request'])
     end
 end

@@ -4,7 +4,7 @@ ruby '2.7.0' if ENV['DYNO']
 
 gem 'travis-logger',  git: 'https://github.com/travis-ci/travis-logger'
 gem 'travis-config',  git: 'https://github.com/travis-ci/travis-config'
-gem 'travis-metrics', '~> 2.0.0.rc3'
+gem 'travis-metrics', git: 'https://github.com/travis-ci/travis-metrics', ref: 'sf-unfork'
 gem 'travis-encrypt'
 
 gem 'jemalloc', git: 'https://github.com/joshk/jemalloc-rb', ref: '870facd'
@@ -20,6 +20,6 @@ gem 'cl'
 group :test do
   gem 'rspec'
   gem 'database_cleaner'
-  gem 'factory_girl'
+  gem 'factory_bot'
   gem 'vcr'
 end

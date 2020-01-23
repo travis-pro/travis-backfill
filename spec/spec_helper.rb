@@ -13,6 +13,7 @@ require 'travis/backfill'
 Sidekiq::Testing.inline!
 
 RSpec.configure do |c|
+  c.include FactoryBot::Syntax::Methods
   c.include Support::Env
   c.include Support::Logger
   c.include Support::Redis

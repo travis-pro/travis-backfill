@@ -5,35 +5,21 @@ module Travis
   module Backfill
     class Cli
       class Schedule < Cl::Cmd
-        purpose 'Schedule tasks for backfilling records'
+        description 'Schedule tasks for backfilling records'
 
         MSGS = {
           announce: 'Starting scheduling on %d shards size=%d.'
         }
 
-        on '-o', '--offset OFFSET', 'Starting point for N shards' do |value|
-          opts[:offset] = value.to_i
-        end
-
-        on '-p', '--per_page PER_PAGE', 'Number of records to retrieve at a time (query batch size)' do |value|
-          opts[:per_page] = value.to_i
-        end
-
-        on '-r', '--rerun', 'Start over and re-schedule all records' do
-          opts[:rerun] = true
-        end
-
-        on '-s', '--shards SHARDS', 'Number of scheduling shards' do |value|
-          opts[:threads] = value.to_i
-        end
-
-        on '-t', '--task TASK', 'The task to perform per record' do |value|
-          opts[:task] = value
-        end
+        opt '-o', '--offset OFFSET', 'Starting point for N shards', type: :int
+        opt '-p', '--per_page PER_PAGE', 'Number of records to retrieve at a time (query batch size)', type: :int
+        opt '-s', '--shards SHARDS', 'Number of scheduling shards', type: :int, default: 1
+        opt '-t', '--task TASK', 'The task to perform per record'
+        opt '-r', '--rerun', 'Start over and re-schedule all records'
 
         def run
           announce
-          1.upto(threads) do |num|
+          1.upto(shards) do |num|
             start = (num - 1) * count + offset
             Thread.new { schedule(num, start) }
           end
@@ -41,7 +27,7 @@ module Travis
         end
 
         def announce
-          puts MSGS[:announce] % [threads, count, count + offset]
+          puts MSGS[:announce] % [shards, count, count + offset]
         end
 
         def schedule(num, start)
@@ -52,26 +38,14 @@ module Travis
           retry
         end
 
-        def offset
-          opts[:offset].to_i
-        end
-
         def count
-          count = max_id / threads * 2
+          count = max_id / shards * 2
           log = Math.log10(count).floor
           count = (count / (10.0 ** log)).ceil * 10 ** log / 2
         end
 
         def max_id
           @max_id ||= Registry[:task][task].store.new.max_id
-        end
-
-        def threads
-          opts[:threads] || 1
-        end
-
-        def task
-          opts[:task]
         end
 
         def opts
@@ -89,7 +63,7 @@ module Travis
         def defaults
           @defaults ||= {
             offset:   ENV.fetch("#{task.upcase}_UPDATE_SCHEDULE_OFFSET", 0).to_i,
-            threads:  ENV.fetch("#{task.upcase}_UPDATE_SCHEDULE_SHARDS", 1).to_i,
+            shards:  ENV.fetch("#{task.upcase}_UPDATE_SCHEDULE_SHARDS", 1).to_i,
             per_page: ENV.fetch("#{task.upcase}_UPDATE_SCHEDULE_PAGE", 1000).to_i,
             rerun:    ENV.fetch("#{task.upcase}_UPDATE_SCHEDULE_RERUN", false)
           }

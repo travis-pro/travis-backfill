@@ -1,10 +1,10 @@
 describe Travis::Backfill::Task::PullRequest::Update, vcr: { cassette_name: 'pull_request_found' } do
   let(:payload) { { pull_request: { number: 1, title: 'title', head: { ref: 'ref', repo: { id: 3, full_name: 'slug' } } } } }
-  let(:data)    { Payload.new(deep_stringify(payload)) }
-  let(:repo)    { FactoryGirl.create(:repo, owner_name: 'svenfuchs', name: 'gem-release') }
-  let(:request) { FactoryGirl.create(:request, repository: repo, commit: commit, builds: [build], payload: data, created_at: 1.year.ago) }
-  let(:commit)  { FactoryGirl.create(:commit) }
-  let(:build)   { FactoryGirl.create(:build) }
+  let(:data)    { Travis::Backfill::Helper::Payload.new(deep_stringify(payload)) }
+  let(:repo)    { create(:repo, owner_name: 'svenfuchs', name: 'gem-release') }
+  let(:request) { create(:request, repository: repo, commit: commit, builds: [build], payload: data, created_at: 1.year.ago) }
+  let(:commit)  { create(:commit) }
+  let(:build)   { create(:build) }
   let(:task)    { described_class.new(request: request, commit: commit, build: build, data: data) }
   let(:record)  { request.reload.pull_request }
 
@@ -29,12 +29,12 @@ describe Travis::Backfill::Task::PullRequest::Update, vcr: { cassette_name: 'pul
 
   describe 'the pull_request the record exists' do
     describe 'the pull_request is not linked to the request' do
-      before { FactoryGirl.create(:pull_request, repository_id: repo.id, number: 2) }
+      before { create(:pull_request, repository_id: repo.id, number: 2) }
       include_examples 'pull_request'
     end
 
     describe 'the pull_request is linked to the request' do
-      before { FactoryGirl.create(:pull_request, repository_id: repo.id, number: 2) }
+      before { create(:pull_request, repository_id: repo.id, number: 2) }
       before { request.update_attributes(pull_request: PullRequest.first) }
       include_examples 'pull_request'
     end

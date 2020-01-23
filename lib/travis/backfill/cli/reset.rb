@@ -4,12 +4,8 @@ require 'travis/backfill/schedule'
 module Travis
   module Backfill
     class Cli
-      class Reset < Struct.new(:args, :opts)
-        include Cl::Cmd
-
-        register 'reset'
-
-        purpose 'Reset backfilling scheduling cursors, and clear the Sidekiq queue.'
+      class Reset < Cl::Cmd
+        description 'Reset backfilling scheduling cursors, and clear the Sidekiq queue.'
 
         def run
           reset_cursors

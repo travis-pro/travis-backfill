@@ -32,9 +32,3 @@ module Travis
     setup
   end
 end
-
-Payload = Struct.new(:value) do
-  def method_missing(name)
-    Payload.new(value.nil? ? nil : value[name.to_s])
-  end
-end

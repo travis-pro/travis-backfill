@@ -48,12 +48,12 @@ module Travis
             memoize :build
 
             def data
-              data = request.payload
+              data = request.payload.payload
               data = JSON.parse(data) rescue nil if data.is_a?(String) && data[0, 2] == '{"'
               data = data || {}
-              Payload.new(data)
+              Helper::Payload.new(data)
             rescue => e
-              Payload.new({})
+              Helper::Payload.new({})
             end
             memoize :data
         end

@@ -1,8 +1,8 @@
 describe Travis::Backfill::Task::Sender::Update do
-  let(:data)    { Payload.new(deep_stringify(payload)) }
-  let(:request) { FactoryGirl.create(:request, builds: [build], payload: data, event_type: event, created_at: 1.year.ago) }
-  let(:build)   { FactoryGirl.create(:build) }
-  let(:user)    { FactoryGirl.create(:user, login: 'login', github_id: 2208) }
+  let(:data)    { Travis::Backfill::Helper::Payload.new(deep_stringify(payload)) }
+  let(:request) { create(:request, builds: [build], payload: data, event_type: event, created_at: 1.year.ago) }
+  let(:build)   { create(:build) }
+  let(:user)    { create(:user, login: 'login', github_id: 2208) }
   let(:task)    { described_class.new(request: request, build: build, data: data) }
 
   shared_examples 'sets the sender' do

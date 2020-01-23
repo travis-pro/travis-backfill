@@ -1,14 +1,14 @@
 describe Travis::Backfill::Task::Request::Update, vcr: { cassette_name: 'pull_request_found' } do
-  let(:repo)    { FactoryGirl.create(:repo, owner_name: 'svenfuchs', name: 'gem-release') }
-  let(:request) { FactoryGirl.create(:request, event_type: event, repository: repo, commit: commit, payload: deep_stringify(payload), created_at: 1.year.ago) }
-  let(:commit)  { FactoryGirl.create(:commit, ref: respond_to?(:ref) ? ref : nil) }
-  let!(:build)  { FactoryGirl.create(:build, request: request) }
+  let(:repo)    { create(:repo, owner_name: 'svenfuchs', name: 'gem-release') }
+  let(:request) { create(:request, event_type: event, repository: repo, commit: commit, payload: deep_stringify(payload), created_at: 1.year.ago) }
+  let(:commit)  { create(:commit, ref: respond_to?(:ref) ? ref : nil) }
+  let!(:build)  { create(:build, request: request) }
   let(:task)    { described_class.new(id: request.id) }
 
   before { task.run }
 
   describe 'with a pull_request event' do
-    let(:payload) { { pull_request: { number: 1, title: 'title', head: { ref: 'ref', repo: { id: 3, full_name: 'slug' } } } } }
+    let(:payload) { { pull_request: { id: 1, number: 1, title: 'title', head: { ref: 'ref', repo: { id: 3, full_name: 'slug' } } } } }
     let(:event)   { :pull_request }
     let(:record)  { request.reload.pull_request }
 

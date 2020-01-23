@@ -18,6 +18,14 @@ GIT
   specs:
     travis-logger (0.0.1)
 
+GIT
+  remote: https://github.com/travis-ci/travis-metrics
+  revision: 6dcec59b4e85ef8a0dc10ca07c3a0b39157e9bca
+  ref: sf-unfork
+  specs:
+    travis-metrics (2.0.0)
+      metriks-librato_metrics (~> 1.0)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -42,8 +50,8 @@ GEM
     connection_pool (2.2.2)
     database_cleaner (1.7.0)
     diff-lcs (1.3)
-    factory_girl (4.9.0)
-      activesupport (>= 3.0.0)
+    factory_bot (5.1.1)
+      activesupport (>= 4.2.0)
     faraday (0.17.3)
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.14.0)
@@ -88,8 +96,6 @@ GEM
       redis (>= 3.3.5, < 5)
     thread_safe (0.3.6)
     travis-encrypt (0.0.5)
-    travis-metrics (2.0.1)
-      metriks-librato_metrics (~> 1.0)
     tzinfo (1.2.6)
       thread_safe (~> 0.1)
     vcr (5.0.0)
@@ -101,7 +107,7 @@ DEPENDENCIES
   activerecord
   cl
   database_cleaner
-  factory_girl
+  factory_bot
   faraday
   faraday_middleware
   jemalloc!
@@ -113,7 +119,7 @@ DEPENDENCIES
   travis-config!
   travis-encrypt
   travis-logger!
-  travis-metrics (~> 2.0.0.rc3)
+  travis-metrics!
   vcr
 
 BUNDLED WITH

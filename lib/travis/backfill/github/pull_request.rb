@@ -1,4 +1,5 @@
 require 'travis/backfill/helper/http'
+require 'travis/backfill/helper/payload'
 require 'travis/support/registry'
 
 module Travis
@@ -14,7 +15,7 @@ module Travis
         attr_reader :token
 
         def data
-          @data ||= map(Payload.new(fetch || unknown))
+          @data ||= map(Helper::Payload.new(fetch || unknown))
         end
 
         private
