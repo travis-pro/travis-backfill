@@ -4,7 +4,7 @@ services:
 import:
   - travis-ci/build-configs:db-setup.yml
 
-rvm: 2.4.1
+rvm: 2.5
 
 before_install:
   - rvm list
