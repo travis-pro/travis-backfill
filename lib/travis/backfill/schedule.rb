@@ -6,31 +6,31 @@ module Travis
     class Schedule
       MAX_QUEUE_SIZE = Integer(ENV['BACKFILL_MAX_QUEUE_SIZE'] || 10_000)
 
-      attr_reader :store, :cursor, :num, :start, :count, :per_page, :max, :opts
+      attr_reader :store, :cursor, :num, :start, :per_page, :max, :opts, :step
 
       def initialize(opts)
         @opts     = opts
         @store    = Registry[:task][task].store.new(rerun: opts[:rerun])
         @num      = opts[:num]
         @start    = opts[:start]
-        @count    = opts[:count]
-        @max      = start + count
+        @max      = opts[:max]
         @per_page = opts[:per_page]
+        @step     = opts[:step]
         @cursor   = last_cursor || start
         Thread.new { monitor }
       end
 
       MSGS = {
-        start: 'Start cursor=%{cursor} count=%{count} max=%{max} per_page=%{per_page} queue=%{queue}',
-        page:  'Page cursor=%{cursor} count=%{count} max=%{max} per_page=%{per_page} queue=%{queue}',
-        done:  'Done cursor=%{cursor} count=%{count} max=%{max} per_page=%{per_page} queue=%{queue}',
+        start: 'Start cursor=%{cursor} start=%{start} max=%{max} per_page=%{per_page} queue=%{queue}',
+        page:  'Page cursor=%{cursor} start=%{start} max=%{max} per_page=%{per_page} queue=%{queue}',
+        done:  'Done cursor=%{cursor} start=%{start} max=%{max} per_page=%{per_page} queue=%{queue}',
       }
 
       def run
         info :start
         process
         info :done
-        sleep unless testing?
+        # sleep unless testing?
       rescue ActiveRecord::StatementInvalid => e
         puts e.message
         sleep 5
@@ -56,7 +56,7 @@ module Travis
             ::Sidekiq::Client.push_bulk(
               'queue' => 'backfill',
               'class' => 'Travis::Backfill::Worker',
-              'args'  => ids.map { |id| [:backfill, task, id: id] }
+              'args'  => ids.map { |id| [:backfill, task, opts.merge(id: id)] }
             )
           end
         end
@@ -64,8 +64,7 @@ module Travis
         def ids
           from = cursor
           to = [cursor + per_page, max].min - 1
-          # store.ids_within(from..to)
-          from..to
+          from.step(to: to, by: step).to_a
         end
 
         def testing?
@@ -101,7 +100,7 @@ module Travis
         end
 
         def info(msg)
-          msg = MSGS[msg] % { cursor: cursor, count: count, max: max, per_page: per_page, queue: queue.size }
+          msg = MSGS[msg] % { cursor: cursor, start: start, max: max, per_page: per_page, queue: queue.size }
           logger.info "[#{num}] #{msg}"
         end
 

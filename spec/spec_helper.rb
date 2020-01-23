@@ -17,6 +17,7 @@ RSpec.configure do |c|
   c.include Support::Env
   c.include Support::Logger
   c.include Support::Redis
+  c.include Travis::Backfill::Helper::Hash
 end
 
 def deep_stringify(hash)

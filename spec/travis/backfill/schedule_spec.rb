@@ -28,7 +28,7 @@ module Test
 end
 
 describe Travis::Backfill::Schedule do
-  let(:opts)     { { task: :test, num: 1, start: 0, count: 10, per_page: 5 } }
+  let(:opts)     { { task: :test, num: 1, start: 0, max: 10, per_page: 5 } }
   let(:schedule) { described_class.new(opts) }
   let(:task)     { Test::Task }
   let(:sidekiq)  { Sidekiq::Client }
@@ -40,10 +40,10 @@ describe Travis::Backfill::Schedule do
   it { expect(sidekiq).to have_received(:push_bulk).exactly(2).times }
   it { expect(task.count).to eq 10 }
 
-  it { expect(log).to include 'Start cursor=0 count=10 max=10 per_page=5' }
-  it { expect(log).to include 'Page cursor=0 count=10 max=10 per_page=5' }
-  it { expect(log).to include 'Page cursor=5 count=10 max=10 per_page=5' }
-  it { expect(log).to include 'Done cursor=10 count=10 max=10 per_page=5' }
+  it { expect(log).to include 'Start cursor=0 start=0 max=10 per_page=5' }
+  it { expect(log).to include 'Page cursor=0 start=0 max=10 per_page=5' }
+  it { expect(log).to include 'Page cursor=5 start=0 max=10 per_page=5' }
+  it { expect(log).to include 'Done cursor=10 start=0 max=10 per_page=5' }
 
   1.upto(9) do |id|
     it { expect(log).to include "Backfilling test id=#{id}" }

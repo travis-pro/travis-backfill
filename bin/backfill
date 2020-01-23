@@ -7,4 +7,4 @@ $: << 'lib'
 require 'travis/backfill'
 require 'sidekiq/cli' # force Sidekiq server mode to set redis pool size
 
-Cl.run(ARGV)
+Cl.new.run(ARGV)
