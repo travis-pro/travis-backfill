@@ -1,15 +1,10 @@
-require 'travis/backfill/helper/hash'
-require 'travis/backfill/helper/metrics'
-require 'travis/backfill/helper/memoize'
-require 'travis/support/registry'
+require 'travis/backfill/task/base'
 
 module Travis
   module Backfill
     module Task
       module PullRequest
-        class State < Struct.new(:params)
-          include Helper::Hash, Memoize, Metrics, Registry
-
+        class State < Base
           register :task, 'pull_request:state'
 
           def run?

@@ -1,9 +1,4 @@
-require 'json'
-require 'travis/backfill/helper/hash'
-require 'travis/backfill/helper/logging'
-require 'travis/backfill/helper/metrics'
-require 'travis/backfill/helper/memoize'
-require 'travis/support/registry'
+require 'travis/backfill/task/base'
 
 # The first request for a tag push event was id=272455 on 2012-03-27 15:16:02
 
@@ -11,9 +6,7 @@ module Travis
   module Backfill
     module Task
       module Tag
-        class Update < Struct.new(:params)
-          include Helper::Hash, Logging, Metrics, Registry
-
+        class Update < Base
           register :task, 'tag:update'
 
           attr_reader :record

@@ -1,8 +1,4 @@
-require 'json'
-require 'travis/backfill/helper/hash'
-require 'travis/backfill/helper/logging'
-require 'travis/backfill/helper/metrics'
-require 'travis/support/registry'
+require 'travis/backfill/task/base'
 
 # The first `push` request payload that included the sender field was
 # id=11004914 on 2014-09-24 06:26:35 UTC. Before that date GitHub did not
@@ -16,9 +12,7 @@ module Travis
   module Backfill
     module Task
       module Sender
-        class Update < Struct.new(:params)
-          include Helper::Hash, Metrics, Registry
-
+        class Update < Base
           register :task, 'sender:update'
 
           attr_reader :record
