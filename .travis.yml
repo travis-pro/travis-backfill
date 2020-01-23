@@ -1,11 +1,13 @@
 services:
   - redis-server
+
+import:
+  - travis-ci/build-configs:db-setup.yml
+
 rvm: 2.4.1
+
 before_install:
   - rvm list
-before_script:
-  - export DB_STRUCTURE_URL=https://raw.githubusercontent.com/travis-ci/travis-migrations/master/db/main/structure.sql
-  - createdb travis_test || true
-  - curl -fs $DB_STRUCTURE_URL | psql travis_test
+
 script: bundle exec rspec
 
