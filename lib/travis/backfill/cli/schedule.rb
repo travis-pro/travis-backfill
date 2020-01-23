@@ -4,23 +4,11 @@ require 'travis/backfill/schedule'
 module Travis
   module Backfill
     class Cli
-      class Schedule < Struct.new(:args, :opts)
-        include Cl::Cmd
-
-        register 'schedule'
-
+      class Schedule < Cl::Cmd
         purpose 'Schedule tasks for backfilling records'
 
         MSGS = {
           announce: 'Starting scheduling on %d shards size=%d.'
-        }
-
-        DEFAULTS = {
-          # TODO make defaults dynamic per task key
-          offset:   ENV['BACKFILL_REQUEST_UPDATE_SCHEDULE_OFFSET'] || 0,
-          threads:  ENV['BACKFILL_REQUEST_UPDATE_SCHEDULE_SHARDS'] || 1,
-          per_page: ENV['BACKFILL_REQUEST_UPDATE_SCHEDULE_PAGE']   || 1000,
-          rerun:    ENV['BACKFILL_REQUEST_UPDATE_SCHEDULE_RERUN']
         }
 
         on '-o', '--offset OFFSET', 'Starting point for N shards' do |value|
@@ -96,6 +84,15 @@ module Travis
 
         def compact(hash)
           hash.reject { |_, value| value.nil? }
+        end
+
+        def defaults
+          @defaults ||= {
+            offset:   ENV.fetch("#{task.upcase}_UPDATE_SCHEDULE_OFFSET", 0).to_i,
+            threads:  ENV.fetch("#{task.upcase}_UPDATE_SCHEDULE_SHARDS", 1).to_i,
+            per_page: ENV.fetch("#{task.upcase}_UPDATE_SCHEDULE_PAGE", 1000).to_i,
+            rerun:    ENV.fetch("#{task.upcase}_UPDATE_SCHEDULE_RERUN", false)
+          }
         end
       end
     end
